@@ -1,5 +1,22 @@
-import { HomeLayout } from "@/modules/home/ui/layouts/home-layout";
+import HomeView from "@/modules/home/views/HomeView";
+import { HydrateClient, prefetch, trpc } from "@/trpc/server";
 
-export default function Page() {
-  return <HomeLayout>Will load videos</HomeLayout>;
+export const dynamic = "force-dynamic";
+
+interface PageProps {
+  searchParams: Promise<{ categoryId?: string }>;
 }
+
+const Page = async ({ searchParams }: PageProps) => {
+  prefetch(trpc.categories.getMany.queryOptions());
+
+  const { categoryId } = await searchParams;
+
+  return (
+    <HydrateClient>
+      <HomeView categoryId={categoryId} />
+    </HydrateClient>
+  );
+};
+
+export default Page;
